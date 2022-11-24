@@ -1,0 +1,9 @@
+services:
+  user:
+    build: .
+    container_name: usercontainer
+    command: uvicorn user.index:app --host 0.0.0.0 --port 80 --reload --reload-include *
+    ports:
+      - "80:80"
+    volumes:
+      - .:/GrimReaper
