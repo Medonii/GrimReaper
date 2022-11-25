@@ -1,9 +1,22 @@
 services:
   user:
-    build: .
+    build: 
+      context: ./user
+      dockerfile: Dockerfile
     container_name: usercontainer
     command: uvicorn user.index:app --host 0.0.0.0 --port 80 --reload --reload-include *
     ports:
       - "80:80"
     volumes:
-      - .:/GrimReaper
+      - .:/GrimReaper/user
+
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: authcontainer
+    command: uvicorn auth.index:app --host 0.0.0.0 --port 8000 --reload --reload-include *
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/GrimReaper/auth
