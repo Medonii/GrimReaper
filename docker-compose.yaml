@@ -9,14 +9,3 @@ services:
       - "80:80"
     volumes:
       - .:/GrimReaper/user
-
-  auth:
-    build:
-      context: ./auth
-      dockerfile: Dockerfile
-    container_name: authcontainer
-    command: uvicorn auth.index:app --host 0.0.0.0 --port 8000 --reload --reload-include *
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/GrimReaper/auth
