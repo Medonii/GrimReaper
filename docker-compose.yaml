@@ -9,3 +9,14 @@ services:
       - "80:80"
     volumes:
       - .:/GrimReaper/user
+
+  ambulance:
+    build: 
+      context: ./ambulance
+      dockerfile: Dockerfile
+    container_name: ambulancecontainer
+    command: uvicorn ambulance.index:app --host 0.0.0.0 --port 8000 --reload --reload-include *
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/GrimReaper/ambulance
