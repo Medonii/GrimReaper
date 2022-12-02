@@ -21,7 +21,7 @@ async def create_user(user: User):
     if user_db is not None:
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this nickname already exist"
+            detail="User with this nickname already exists"
         )
     conn.execute(users.insert().values(
         nickname = user.nickname,
