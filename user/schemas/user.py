@@ -1,5 +1,9 @@
 from pydantic import BaseModel
+from typing import Union
+
 
 class User(BaseModel):
-    nickname: str
-    password: str
+    nickname: Union[str, None] = None
+    password: Union[str, None] = None
+
+    
