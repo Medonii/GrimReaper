@@ -13,8 +13,14 @@ async def fetch_ambulances():
     return conn.execute(ambulances.select()).fetchall()
 
 @ambulance.get('/{id}')
+async def fetch_ambulance_position(id: int):
+    row = conn.execute(ambulances.select().position.where(ambulances.c.id == id)).first()
+    return row["tag"]
+
+@ambulance.get('/{id}')
 async def fetch_ambulance(id: int):
-    return conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
+    row = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
+    return row['position']
 
 @ambulance.post('/')
 async def create_ambulance(ambulance: Ambulance):
