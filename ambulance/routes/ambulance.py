@@ -21,6 +21,7 @@ async def fetch_ambulance_position(id: int):
 async def fetch_ambulance(id: int):
     row = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     return row['position']
+#test
 
 @ambulance.post('/')
 async def create_ambulance(ambulance: Ambulance):
