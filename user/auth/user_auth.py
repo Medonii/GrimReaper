@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
+from typing import List, Union
 
-from fastapi import Depends, HTTPException, status, APIRouter
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from fastapi import Depends, HTTPException, status, APIRouter, Security
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes
+from pydantic import BaseModel, ValidationError
 from config.db import conn
 from models.user import users
 from schemas.user import User
@@ -21,11 +22,14 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
-
+    scopes: List[str] = []
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="token",
+    scopes={"admin": "Do everything.", "operator": "Operate requests", "ambulance_driver": "Read requests, update ambulance."},
+    )
 
 user_auth = APIRouter()
 
@@ -54,7 +58,7 @@ def authenticate_user(nickname: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -65,7 +69,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)):
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = "Bearer"
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -75,13 +83,21 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         nickname: str = payload.get("sub")
         if nickname is None:
-            raise credentials_exception
-        token_data = TokenData(username=nickname)
-    except JWTError:
+            raise 
+        token_scopes = payload.get("scopes", [])
+        token_data = TokenData(scopes=token_scopes, username=nickname)
+    except (JWTError, ValidationError):
         raise credentials_exception
     user = get_user(nickname=token_data.username)
     if user is None:
         raise credentials_exception
+    for scope in security_scopes.scopes:
+        if scope not in token_data.scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )    
     return user
 
 
@@ -96,7 +112,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.nickname}, expires_delta=access_token_expires
+        data={"sub": user.nickname, "scopes": form_data.scopes}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -107,6 +123,6 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 
 
 @user_auth.get("/users/me/items/")
-async def read_own_items(current_user: User = Depends(get_current_user)):
+async def read_own_items(current_user: User = Security(get_current_user, scopes=["operator"])):
     return [{"item_id": "Foo", "owner": current_user.nickname}]
 
