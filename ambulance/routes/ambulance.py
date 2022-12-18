@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from models.ambulance import ambulances
 from config.db import conn
 from schemas.ambulance import Ambulance
+from models.GPS_model import get_position
 
 
 
@@ -24,7 +25,8 @@ async def create_ambulance(ambulance: Ambulance):
             detail="ambulance with this tag already exist"
         )
     conn.execute(ambulances.insert().values(
-        tag = ambulance.tag
+        tag = ambulance.tag,
+        position = get_position()
     ))
     return  conn.execute(ambulances.select()).fetchall()
 
