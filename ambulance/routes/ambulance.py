@@ -15,12 +15,11 @@ async def fetch_ambulances():
 @ambulance.get('/{id}')
 async def fetch_ambulance_position(id: int):
     row = conn.execute(ambulances.select().position.where(ambulances.c.id == id)).first()
-    return row["tag"]
+    return row['position']
 
 @ambulance.get('/{id}')
 async def fetch_ambulance(id: int):
-    row = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
-    return row['position']
+    return conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
 #test
 
 @ambulance.post('/')
