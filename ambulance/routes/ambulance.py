@@ -24,14 +24,23 @@ async def create_ambulance(ambulance: Ambulance):
             detail="ambulance with this tag already exist"
         )
     conn.execute(ambulances.insert().values(
-        tag = ambulance.tag
+        tag = ambulance.tag,
+        type = ambulance.type,
+        status = 'Free'
     ))
     return  conn.execute(ambulances.select()).fetchall()
 
 @ambulance.put('/{id}')
 async def update_ambulance(id: int, ambulance: Ambulance):
     conn.execute(ambulances.update().values(
-        tag = ambulance.tag,
+        tag = ambulance.tag
+    ).where(ambulances.c.id == id))
+    return  conn.execute(ambulances.select()).fetchall()
+
+@ambulance.put('/set_busy_status/{id}')
+async def set_ambulance_as_busy(id: int):
+    conn.execute(ambulances.update().values(
+        status = 'Busy'
     ).where(ambulances.c.id == id))
     return  conn.execute(ambulances.select()).fetchall()
 

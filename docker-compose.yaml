@@ -1,14 +1,14 @@
 services:
-  request:
+  patient:
     build:
-      context: ./request
+      context: patient
       dockerfile: Dockerfile
-    container_name: requestcontainer
-    command: uvicorn request.index:app --host 0.0.0.0 --port 8008 --reload --reload-include *
+    container_name: patientcontainer
+    command: uvicorn patient.index:app --host 0.0.0.0 --port 8008 --reload --reload-include *
     ports:
       - "8008:8008"
     volumes:
-      - .:/GrimReaper/request
+      - .:/GrimReaper/patient
 
   user:
     build: 
