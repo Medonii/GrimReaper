@@ -3,6 +3,10 @@ from models.patient import patients
 from config.db import conn
 from schemas.patient import Patient
 import requests, json
+from models.import_api import get_api_key
+import gmaps
+import googlemaps
+from datetime import datetime
 
 patient = APIRouter()
 
@@ -25,7 +29,8 @@ async def create_patient(patient: Patient):
     conn.execute(patients.insert().values(
         name = patient.name,
         status = "Registered",
-        address = patient.address
+        address = patient.address,
+        type = patient.type
     ))
     return  conn.execute(patients.select()).fetchall()
 
@@ -47,16 +52,49 @@ async def accept_patient(id: int):
 
     url = 'http://ambulance:8000/'
     response = requests.get(url)
-    data = response.json()
+    data = response.text
+    parsed = json.loads(data)
+
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    address = patient_db.address
+
+    route_time = 0
+
+    for ambulance in parsed:
+        if ambulance['status'] == 'Free' and ambulance['type'] == patient_db.type:
+            if route_time==0:
+                route_time = get_time(ambulance['position'], address)
+                selected = ambulance
+            else:
+                if route_time > get_time(ambulance['position'], address):
+                    route_time = get_time(ambulance['position'], address)
+                    selected = ambulance
+
+    if route_time == 0:
+        for ambulance in parsed:
+            if ambulance['status'] == 'Free':
+                if route_time==0:
+                    route_time = get_time(ambulance['position'], address)
+                    selected = ambulance
+                else:
+                    if route_time > get_time(ambulance['position'], address):
+                        route_time = get_time(ambulance['position'], address)
+                        selected = ambulance
+
+    if route_time==0:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No free ambulances."
+        )
 
     conn.execute(patients.update().values(
         status = "Ambulance Assigned",
-        ambulance = data[0]['tag']
+        ambulance = selected['tag']
     ).where(patients.c.id == id))
 
-    requests.put('http://ambulance:8000/set_busy_status/1')
+    requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']))
 
-    return  conn.execute(patients.select()).fetchall()
+    return  conn.execute(patients.select().where(patients.c.id == id)).first()
 
 @patient.put('/reject/{id}')
 async def reject_patient(id: int, patient: Patient):
@@ -64,6 +102,7 @@ async def reject_patient(id: int, patient: Patient):
         status = "Rejected",
         ambulance = None
     ).where(patients.c.id == id))
+
     return  conn.execute(patients.select()).fetchall()
 
 @patient.put('/start/{id}')
@@ -72,3 +111,20 @@ async def start_patient(id: int, patient: Patient):
         status = "In Progress"
     ).where(patients.c.id == id))
     return  conn.execute(patients.select()).fetchall()
+
+@patient.put('/close/{id}')
+async def start_patient(id: int, patient: Patient):
+    conn.execute(patients.update().values(
+        status = "Finished"
+    ).where(patients.c.id == id))
+    return  conn.execute(patients.select()).fetchall()
+
+api_key = get_api_key()
+gmaps.configure(api_key)
+
+def get_time(origin , dest):
+    gmaps = googlemaps.Client(key=api_key)
+    now = datetime.now()
+    direction_result = gmaps.directions(origin, dest, mode="driving", avoid="ferries", departure_time=now)
+    print(direction_result[0]['legs'][0]['duration']['text'])
+    return direction_result[0]['legs'][0]['duration']['value']

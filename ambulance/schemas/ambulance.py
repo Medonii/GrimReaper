@@ -11,3 +11,4 @@ class Statuses(Enum):
 class Ambulance(BaseModel):
     tag: str
     type: str
+    position: str

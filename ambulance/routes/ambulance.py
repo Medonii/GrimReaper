@@ -3,8 +3,6 @@ from models.ambulance import ambulances
 from config.db import conn
 from schemas.ambulance import Ambulance
 
-
-
 ambulance = APIRouter()
 
 @ambulance.get('/')
@@ -26,7 +24,8 @@ async def create_ambulance(ambulance: Ambulance):
     conn.execute(ambulances.insert().values(
         tag = ambulance.tag,
         type = ambulance.type,
-        status = 'Free'
+        status = 'Free',
+        position = ambulance.position
     ))
     return  conn.execute(ambulances.select()).fetchall()
 
@@ -41,6 +40,20 @@ async def update_ambulance(id: int, ambulance: Ambulance):
 async def set_ambulance_as_busy(id: int):
     conn.execute(ambulances.update().values(
         status = 'Busy'
+    ).where(ambulances.c.id == id))
+    return  conn.execute(ambulances.select()).fetchall()
+
+@ambulance.put('/make_available/{id}')
+async def make_available(id: int):
+    conn.execute(ambulances.update().values(
+        status = 'Free'
+    ).where(ambulances.c.id == id))
+    return  conn.execute(ambulances.select()).fetchall()
+
+@ambulance.put('/exclude/{id}')
+async def exclude_ambulance(id: int):
+    conn.execute(ambulances.update().values(
+        status = 'Not Available'
     ).where(ambulances.c.id == id))
     return  conn.execute(ambulances.select()).fetchall()
 
