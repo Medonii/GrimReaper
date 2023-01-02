@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter, HTTPException, status, Request, FastAPI
 from models.patient import patients
 from config.db import conn
 from schemas.patient import Patient
@@ -20,6 +20,7 @@ async def fetch_patient(id: int):
 
 @patient.post('/create')
 async def create_patient(patient: Patient):
+
     patient_db = conn.execute(patients.select().where(patients.c.name == patient.name)).first()
     if patient_db is not None:
             raise HTTPException(
@@ -32,6 +33,7 @@ async def create_patient(patient: Patient):
         address = patient.address,
         type = patient.type
     ))
+
     return  conn.execute(patients.select()).fetchall()
 
 @patient.put('/update/{id}')
