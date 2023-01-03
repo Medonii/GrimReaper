@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from fastapi import Depends
 from fastapi.security import APIKeyHeader
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, SecurityScopes
 from starlette import status
 from starlette.exceptions import HTTPException
 from schemas.gateway import User, UserBody, Token, Ambulance, AmbulanceBody, Patient
@@ -19,6 +19,11 @@ SERVICE_URL_AMBULANCE = "http://ambulance:8000"
 SERVICE_URL_PATIENT = "http://patient:8008"
 
 API_KEY_NAME = "x-api-key"
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="token",
+    scopes={"admin": "Do everything.", "operator": "Operate requests", "ambulance_driver": "Read requests, update ambulance."},
+    )
 
 api_key_header = APIKeyHeader(
     name=API_KEY_NAME,
@@ -34,6 +39,20 @@ def check_api_key(key: str = Depends(api_key_header)):
         detail="You didn't pass the api key in the header! Header: x-api-key",
     )
 
+@route(
+    request_method=app.get,
+    service_url=SERVICE_URL_USER,
+    gateway_path='/users/me',
+    service_path='/users/me',
+    status_code=status.HTTP_200_OK,
+    override_headers=False,
+    response_model=UserBody,
+)
+async def check_query_params_and_body(
+        request: Request, 
+        response: Response,
+):
+    pass
 
 @route(
     request_method=app.get,
@@ -117,6 +136,7 @@ async def check_query_params_and_body(
         user_in: OAuth2PasswordRequestForm = Depends(),
 ):
     pass
+
 
 
 @route(

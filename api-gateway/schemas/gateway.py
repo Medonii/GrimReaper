@@ -8,8 +8,9 @@ class User(BaseModel):
     password: str
 
 class UserBody(BaseModel):
-    nickname: str
-    password: str
+    nickname: Union[str, None] = None
+    password: Union[str, None] = None
+
 
 class Token(BaseModel):
     access_token: str
