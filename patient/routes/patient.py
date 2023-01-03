@@ -32,24 +32,42 @@ async def create_patient(patient: Patient):
         address = patient.address,
         type = patient.type
     ))
-    return  conn.execute(patients.select()).fetchall()
+    return  "Patient created"
 
 @patient.put('/update/{id}')
 async def update_patient(id: int, patient: Patient):
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
     conn.execute(patients.update().values(
         name = patient.name,
         address = patient.address
     ).where(patients.c.id == id))
-    return  conn.execute(patients.select()).fetchall()
+    return "Patient updated"
 
 @patient.delete('/delete/{id}')
 async def delete_patient(id: int):
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
     conn.execute(patients.delete().where(patients.c.id == id))
-    return  conn.execute(patients.select()).fetchall()
+    return  "Patient deleted"
 
 @patient.put('/accept/{id}')
 async def accept_patient(id: int):
 
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
     url = 'http://ambulance:8000/'
     response = requests.get(url)
     data = response.text
@@ -94,30 +112,48 @@ async def accept_patient(id: int):
 
     requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']))
 
-    return  conn.execute(patients.select().where(patients.c.id == id)).first()
+    return  "Patient accepted"
 
 @patient.put('/reject/{id}')
-async def reject_patient(id: int, patient: Patient):
+async def reject_patient(id: int):
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
     conn.execute(patients.update().values(
         status = "Rejected",
         ambulance = None
     ).where(patients.c.id == id))
 
-    return  conn.execute(patients.select()).fetchall()
+    return  "Patient rejected"
 
 @patient.put('/start/{id}')
-async def start_patient(id: int, patient: Patient):
+async def start_patient(id: int):
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
     conn.execute(patients.update().values(
         status = "In Progress"
     ).where(patients.c.id == id))
-    return  conn.execute(patients.select()).fetchall()
+    return  "Patient in progress"
 
 @patient.put('/close/{id}')
-async def start_patient(id: int, patient: Patient):
+async def start_patient(id: int):
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
     conn.execute(patients.update().values(
         status = "Finished"
     ).where(patients.c.id == id))
-    return  conn.execute(patients.select()).fetchall()
+    return  "Patient finished"
 
 api_key = get_api_key()
 gmaps.configure(api_key)

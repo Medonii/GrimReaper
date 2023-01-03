@@ -10,6 +10,7 @@ services:
     volumes:
       - .:/GrimReaper/patient
 
+
   user:
     build: 
       context: ./user
@@ -21,6 +22,7 @@ services:
     volumes:
       - .:/GrimReaper/user
 
+
   ambulance:
     build: 
       context: ./ambulance
@@ -31,3 +33,19 @@ services:
       - "8000:8000"
     volumes:
       - .:/GrimReaper/ambulance
+  
+  api-gateway:
+    build: 
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gatewaycontainer
+    command: uvicorn api-gateway.index:app --host 0.0.0.0 --port 8080 --reload --reload-include *
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/GrimReaper/api-gateway
+
+
+  
+
+

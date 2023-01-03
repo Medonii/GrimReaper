@@ -27,18 +27,30 @@ async def create_user(user: User):
         nickname = user.nickname,
         password = get_password_hash(user.password)
     ))
-    return  conn.execute(users.select()).fetchall()
+    return  "User created"
 
 @user.put('/{id}')
 async def update_user(id: int, user: User):
+    user_db = conn.execute(users.select().where(users.c.id == id)).first()
+    if user_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this id doesn't exist"
+        )
     conn.execute(users.update().values(
         nickname = user.nickname,
         password = get_password_hash(user.password)
     ).where(users.c.id == id))
-    return  conn.execute(users.select()).fetchall()
+    return  "User updated"
 
 @user.delete('/{id}')
 async def delete_user(id: int):
+    user_db = conn.execute(users.select().where(users.c.id == id)).first()
+    if user_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this id doesn't exist"
+        )
     conn.execute(users.delete().where(users.c.id == id))
-    return  conn.execute(users.select()).fetchall()
+    return  "User deleted"
 
