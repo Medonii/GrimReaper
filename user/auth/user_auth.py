@@ -116,6 +116,24 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+@user_auth.post('/register')
+async def create_user(form_data: OAuth2PasswordRequestForm = Depends()):
+    user_db = conn.execute(users.select().where(users.c.nickname == form_data.username)).first()
+    if user_db is not None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this nickname already exists"
+        )
+    conn.execute(users.insert().values(
+        nickname = form_data.username,
+        password = get_password_hash(form_data.password)
+    ))
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": form_data.username, "scopes": form_data.scopes}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
 
 @user_auth.get("/users/me/", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_user)):

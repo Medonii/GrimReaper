@@ -7,12 +7,22 @@ from pydantic import BaseModel
 from fastapi import Depends
 from fastapi.security import APIKeyHeader
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, SecurityScopes
 from starlette import status
 from starlette.exceptions import HTTPException
 from schemas.gateway import User, UserBody, Token, Ambulance, AmbulanceBody, Patient
 
 app = FastAPI(title='API Gateway')
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 SERVICE_URL_USER = "http://user:80"
 SERVICE_URL_AMBULANCE = "http://ambulance:8000"
@@ -49,7 +59,7 @@ def check_api_key(key: str = Depends(api_key_header)):
     response_model=UserBody,
 )
 async def check_query_params_and_body(
-        request: Request, 
+        request: Request,
         response: Response,
 ):
     pass
