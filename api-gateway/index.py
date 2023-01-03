@@ -27,6 +27,7 @@ app.add_middleware(
 SERVICE_URL_USER = "http://user:80"
 SERVICE_URL_AMBULANCE = "http://ambulance:8000"
 SERVICE_URL_PATIENT = "http://patient:8008"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 API_KEY_NAME = "x-api-key"
 
@@ -142,6 +143,24 @@ async def check_query_params_and_body(
 )
 async def check_query_params_and_body(
         request: Request, 
+        response: Response,
+        user_in: OAuth2PasswordRequestForm = Depends(),
+):
+    pass
+
+
+@route(
+    request_method=app.post,
+    service_url=SERVICE_URL_USER,
+    gateway_path='/users/register',
+    service_path='/register',
+    status_code=status.HTTP_200_OK,
+    form_params=['user_in'],
+    response_model=Token,
+
+)
+async def check_query_params_and_body(
+        request: Request,
         response: Response,
         user_in: OAuth2PasswordRequestForm = Depends(),
 ):
