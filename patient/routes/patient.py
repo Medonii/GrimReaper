@@ -59,8 +59,8 @@ async def delete_patient(id: int):
     conn.execute(patients.delete().where(patients.c.id == id))
     return  "Patient deleted"
 
-@patient.put('/accept/{id}')
-async def accept_patient(id: int):
+@patient.put('/suggest/{id}')
+async def suggest_patient_ambulance(id: int):
 
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
@@ -110,7 +110,25 @@ async def accept_patient(id: int):
         ambulance = selected['tag']
     ).where(patients.c.id == id))
 
-    requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']))
+    return  "Ambulance suggestion made"
+
+@patient.put('/accept/{id}')
+async def accept_patient(id: int):
+
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
+
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+
+    conn.execute(patients.update().values(
+        status = "Ambulance Assigned"
+    ).where(patients.c.id == id))
+
+    requests.put('http://ambulance:8000/set_busy_status/' + str(patient_db.ambulance))
 
     return  "Patient accepted"
 
