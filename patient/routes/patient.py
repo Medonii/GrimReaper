@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi import APIRouter, HTTPException, status, Request
 from models.patient import patients
 from config.db import conn
@@ -11,7 +13,7 @@ from datetime import datetime
 patient = APIRouter()
 
 @patient.get('/')
-async def fetch_patient():
+async def fetch_patient(ambulance: Union[str, None] = None):
     return conn.execute(patients.select()).fetchall()
 
 @patient.get('/fetch/{id}')
