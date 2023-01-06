@@ -31,7 +31,7 @@ async def create_ambulance(ambulance: Ambulance):
 
 @ambulance.put('/{id}')
 async def update_ambulance(id: int, ambulance: Ambulance):
-    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == ambulance.id)).first()
+    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -1,3 +1,4 @@
+from typing import List
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response
@@ -67,6 +68,20 @@ async def check_query_params_and_body(
 @route(
     request_method=app.get,
     service_url=SERVICE_URL_USER,
+    gateway_path='/users/',
+    service_path='/',
+    status_code=status.HTTP_200_OK,
+    override_headers=False,
+    response_model=List[User],
+)
+async def check_query_params_and_body(
+        request: Request, response: Response
+):
+    pass
+
+@route(
+    request_method=app.get,
+    service_url=SERVICE_URL_USER,
     gateway_path='/users/{id}',
     service_path='/{id}',
     status_code=status.HTTP_200_OK,
@@ -104,8 +119,10 @@ async def check_query_params_and_body(
     status_code=status.HTTP_200_OK,
     body_params=["test_body"],
     response_model=str,
+    query_params=["id"],
 )
 async def check_query_params_and_body(
+        id: int,
         request: Request, 
         response: Response,
         test_body: UserBody,
@@ -147,7 +164,19 @@ async def check_query_params_and_body(
 ):
     pass
 
-
+@route(
+    request_method=app.get,
+    service_url=SERVICE_URL_AMBULANCE,
+    gateway_path='/ambulances/',
+    service_path='/',
+    status_code=status.HTTP_200_OK,
+    override_headers=False,
+    response_model=List[Ambulance],
+)
+async def check_query_params_and_body(
+        request: Request, response: Response
+):
+    pass
 
 @route(
     request_method=app.get,
@@ -189,8 +218,10 @@ async def check_query_params_and_body(
     status_code=status.HTTP_200_OK,
     body_params=["test_body"],
     response_model=str,
+    query_params=["id"],
 )
 async def check_query_params_and_body(
+        id:int,
         request: Request, 
         response: Response,
         test_body: AmbulanceBody,
@@ -264,6 +295,20 @@ async def check_query_params_and_body(
 @route(
     request_method=app.get,
     service_url=SERVICE_URL_PATIENT,
+    gateway_path='/patients/',
+    service_path='/',
+    status_code=status.HTTP_200_OK,
+    override_headers=False,
+    response_model=List[Patient],
+)
+async def check_query_params_and_body(
+        request: Request, response: Response
+):
+    pass
+
+@route(
+    request_method=app.get,
+    service_url=SERVICE_URL_PATIENT,
     gateway_path='/patients/{id}',
     service_path='/fetch/{id}',
     status_code=status.HTTP_200_OK,
@@ -302,6 +347,7 @@ async def check_query_params_and_body(
     status_code=status.HTTP_200_OK,
     body_params=["test_body"],
     response_model=str,
+    query_params=["id"],
 )
 async def check_query_params_and_body(
         id: int,
