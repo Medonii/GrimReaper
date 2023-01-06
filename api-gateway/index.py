@@ -123,7 +123,7 @@ async def check_query_params_and_body(
 )
 async def check_query_params_and_body(
         id: int,
-        request: Request, 
+        request: Request,
         response: Response,
         test_body: UserBody,
 ):
@@ -163,6 +163,25 @@ async def check_query_params_and_body(
         user_in: OAuth2PasswordRequestForm = Depends(),
 ):
     pass
+
+
+@route(
+    request_method=app.post,
+    service_url=SERVICE_URL_USER,
+    gateway_path='/users/register',
+    service_path='/register',
+    status_code=status.HTTP_200_OK,
+    form_params=['user_in'],
+    response_model=Token,
+
+)
+async def check_query_params_and_body(
+        request: Request,
+        response: Response,
+        user_in: OAuth2PasswordRequestForm = Depends(),
+):
+    pass
+
 
 @route(
     request_method=app.get,
@@ -222,7 +241,7 @@ async def check_query_params_and_body(
 )
 async def check_query_params_and_body(
         id:int,
-        request: Request, 
+        request: Request,
         response: Response,
         test_body: AmbulanceBody,
 ):
