@@ -2,10 +2,16 @@ from pydantic import BaseModel
 from typing import Union
 from enum import Enum
 
+class Roles(Enum):
+    OP = 'Operator'
+    AD = 'Admin'
+    DR = 'Ambulance driver'
+
 class User(BaseModel):
-    id: int
-    nickname: str
-    password: str
+    nickname: Union[str, None] = None
+    password: Union[str, None] = None
+    role: Union[Roles, None] = None
+    ambulance: Union[str, None] = None
 
 class UserBody(BaseModel):
     nickname: Union[str, None] = None
@@ -29,10 +35,11 @@ class AmbulanceBody(BaseModel):
 
 class Statuses(Enum):
     A = 'Ambulance Assigned'
+    S = "Ambulance Suggested"
     R = 'Registered'
     X = 'Rejected'
-    F = 'Finished'
     P = 'In Progress'
+    F = 'Finished'
 
 class Patient(BaseModel):
     name: Union[str, None]

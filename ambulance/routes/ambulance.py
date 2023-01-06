@@ -1,9 +1,22 @@
-from fastapi import APIRouter, HTTPException, status
+from venv import logger
+from fastapi import APIRouter, HTTPException, status, Depends
 from models.ambulance import ambulances
 from config.db import conn
 from schemas.ambulance import Ambulance
+from typing import List
+from user.auth.user_auth import get_user
+from user.schemas.user import User
 
 ambulance = APIRouter()
+
+class RoleChecker:
+    def __init__(self, allowed_roles: List):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, user: User = Depends(get_user)):
+        if user.role not in self.allowed_roles:
+            logger.debug(f"User with role {user.role} not in {self.allowed_roles}")
+            raise HTTPException(status_code=403, detail="Operation not permitted")
 
 @ambulance.get('/')
 async def fetch_ambulances():

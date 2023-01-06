@@ -1,13 +1,11 @@
 from datetime import datetime, timedelta
 from typing import List, Union
-
 from fastapi import Depends, HTTPException, status, APIRouter, Security
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes
 from pydantic import BaseModel, ValidationError
 from config.db import conn
-from models.user import users
-from schemas.user import User
-
+from user.models.user import users
+from user.schemas.user import User
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 

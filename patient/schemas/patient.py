@@ -4,8 +4,11 @@ from enum import Enum
 
 class Statuses(Enum):
     A = 'Ambulance Assigned'
+    S = "Ambulance Suggested"
     R = 'Registered'
     X = 'Rejected'
+    P = 'In Progress'
+    F = 'Finished'
 
 
 class Patient(BaseModel):

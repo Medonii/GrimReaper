@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from venv import logger
+from fastapi import APIRouter, HTTPException, status, Request, Depends
 from models.patient import patients
 from config.db import conn
 from schemas.patient import Patient
@@ -7,11 +8,26 @@ from models.import_api import get_api_key
 import gmaps
 import googlemaps
 from datetime import datetime
+from typing import List, Union
+
+from user.auth.user_auth import get_user
+from user.schemas.user import User
 
 patient = APIRouter()
 
+class RoleChecker:
+    def __init__(self, allowed_roles: List):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, user: User = Depends(get_user)):
+        if user.role not in self.allowed_roles:
+            logger.debug(f"User with role {user.role} not in {self.allowed_roles}")
+            raise HTTPException(status_code=403, detail="Operation not permitted")
+
 @patient.get('/')
-async def fetch_patient():
+async def fetch_patient(ambulance: Union[str, None] = None):
+    if ambulance:
+        return conn.execute(patients.select().where(patients.c.tag == ambulance).fetchAll())
     return conn.execute(patients.select()).fetchall()
 
 @patient.get('/fetch/{id}')
@@ -59,8 +75,10 @@ async def delete_patient(id: int):
     conn.execute(patients.delete().where(patients.c.id == id))
     return  "Patient deleted"
 
-@patient.put('/accept/{id}')
-async def accept_patient(id: int):
+allow_accept = RoleChecker(["Ambulance driver"])
+
+@patient.put('/suggest/{id}',dependencies=[Depends(allow_accept)])
+async def suggest_patient_ambulance(id: int):
 
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
@@ -110,11 +128,31 @@ async def accept_patient(id: int):
         ambulance = selected['tag']
     ).where(patients.c.id == id))
 
-    requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']))
+    return  "Ambulance suggestion made"
+
+@patient.put('/accept/{id}',dependencies=[Depends(allow_accept)])
+async def accept_patient(id: int):
+
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
+
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+
+    conn.execute(patients.update().values(
+        status = "Ambulance Assigned"
+    ).where(patients.c.id == id))
+
+    requests.put('http://ambulance:8000/set_busy_status/' + str(patient_db.ambulance))
 
     return  "Patient accepted"
 
-@patient.put('/reject/{id}')
+allow_reject = RoleChecker(["Ambulance driver"])
+
+@patient.put('/reject/{id}', dependencies=[Depends(allow_reject)])
 async def reject_patient(id: int):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
@@ -158,7 +196,7 @@ async def start_patient(id: int):
 api_key = get_api_key()
 gmaps.configure(api_key)
 
-def get_time(origin , dest):
+def get_time(origin, dest):
     gmaps = googlemaps.Client(key=api_key)
     now = datetime.now()
     direction_result = gmaps.directions(origin, dest, mode="driving", avoid="ferries", departure_time=now)
