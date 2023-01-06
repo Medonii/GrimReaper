@@ -208,8 +208,10 @@ async def check_query_params_and_body(
     status_code=status.HTTP_200_OK,
     body_params=["test_body"],
     response_model=str,
+    query_params=["id"],
 )
 async def check_query_params_and_body(
+        id: int,
         request: Request, 
         response: Response,
         test_body: AmbulanceBody,

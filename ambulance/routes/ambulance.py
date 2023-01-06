@@ -29,16 +29,18 @@ async def create_ambulance(ambulance: Ambulance):
     ))
     return  "Ambulance created"
 
-@ambulance.put('/{id}')
+@ambulance.put('/update/{id}')
 async def update_ambulance(id: int, ambulance: Ambulance):
-    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == ambulance.id)).first()
+    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ambulance with this id doesn't exist"
         )
     conn.execute(ambulances.update().values(
-        tag = ambulance.tag
+        tag = ambulance.tag,
+        type = ambulance.type,
+        position = ambulance.position
     ).where(ambulances.c.id == id))
     return  "Ambulance updated"
 
