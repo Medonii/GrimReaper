@@ -6,11 +6,14 @@ class User(BaseModel):
     id: int
     nickname: str
     password: str
+    role: Union[str, None] = None
+    ambulance: Union[str, None] = None
 
 class UserBody(BaseModel):
     nickname: Union[str, None] = None
     password: Union[str, None] = None
-
+    role: Union[str, None] = None
+    ambulance: Union[str, None] = None
 
 class Token(BaseModel):
     access_token: str

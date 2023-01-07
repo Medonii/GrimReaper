@@ -14,7 +14,8 @@ patient = APIRouter()
 
 @patient.get('/')
 async def fetch_patient(ambulance: Union[str, None] = None):
-    return conn.execute(patients.select()).fetchall()
+        if ambulance: return conn.execute(patients.select().where(patients.c.ambulance == ambulance)).fetchall()
+        else: return conn.execute(patients.select()).fetchall()
 
 @patient.get('/fetch/{id}')
 async def fetch_patient(id: int):

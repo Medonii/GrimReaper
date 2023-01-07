@@ -25,7 +25,8 @@ async def create_user(user: User):
         )
     conn.execute(users.insert().values(
         nickname = user.nickname,
-        password = get_password_hash(user.password)
+        password = get_password_hash(user.password),
+        role = "Operator"
     ))
     return  "User created"
 
@@ -39,7 +40,9 @@ async def update_user(id: int, user: User):
         )
     conn.execute(users.update().values(
         nickname = user.nickname,
-        password = get_password_hash(user.password)
+        password = get_password_hash(user.password),
+        role = user.role,
+        ambulance = user.ambulance
     ).where(users.c.id == id))
     return  "User updated"
 
