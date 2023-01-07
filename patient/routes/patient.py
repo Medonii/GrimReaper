@@ -109,7 +109,7 @@ async def suggest_patient_ambulance(id: int):
         )
 
     conn.execute(patients.update().values(
-        status = "Ambulance Assigned",
+        status = "Ambulance Suggestion Made",
         ambulance = selected['tag']
     ).where(patients.c.id == id))
 
@@ -131,7 +131,16 @@ async def accept_patient(id: int):
         status = "Ambulance Assigned"
     ).where(patients.c.id == id))
 
-    requests.put('http://ambulance:8000/set_busy_status/' + str(patient_db.ambulance))
+    url = 'http://ambulance:8000/'
+    response = requests.get(url)
+    data = response.text
+    parsed = json.loads(data)
+
+    for ambulance in parsed:
+        if ambulance['tag'] == patient_db.ambulance:
+            selected = ambulance
+
+    requests.put('http://ambulance:8000/set_busy_status/' + selected['id'])
 
     return  "Patient accepted"
 
