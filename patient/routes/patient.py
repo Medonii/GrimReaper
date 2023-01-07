@@ -140,7 +140,7 @@ async def accept_patient(id: int):
         if ambulance['tag'] == patient_db.ambulance:
             selected = ambulance
 
-    requests.put('http://ambulance:8000/set_busy_status/' + selected['id'])
+    requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']))
 
     return  "Patient accepted"
 
