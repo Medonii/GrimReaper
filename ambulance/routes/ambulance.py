@@ -1,13 +1,31 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends, Security
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes
 from models.ambulance import ambulances
 from config.db import conn
 from schemas.ambulance import Ambulance
+import requests
 
 ambulance = APIRouter()
 
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="http://user:80/token",
+    scopes={"admin": "Do everything.", "operator": "Operate requests", "ambulance_driver": "Read requests, update ambulance."},
+    )
+
 @ambulance.get('/')
-async def fetch_ambulances():
-    return conn.execute(ambulances.select()).fetchall()
+async def fetch_ambulances(token: str = Depends(oauth2_scheme)):
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                        "Content-Type": "application/json",
+                        'Authorization': "Bearer " + token,
+                    })
+
+    if(response.json().get('nickname') is not None):
+        return conn.execute(ambulances.select()).fetchall()
+    else:
+        return response.json()
 
 @ambulance.get('/{id}')
 async def fetch_ambulance(id: int):
