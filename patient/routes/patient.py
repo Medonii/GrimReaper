@@ -1,5 +1,5 @@
 from typing import Union
-
+from ambulance.models.ambulance import ambulances
 from fastapi import APIRouter, HTTPException, status, Request
 from models.patient import patients
 from config.db import conn
@@ -152,6 +152,10 @@ async def reject_patient(id: int):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
         )
+
+    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == patient_db.name)).first()
+    requests.put('http://ambulance:8000/make_available/' + str(ambulance_db['id']))
+
     conn.execute(patients.update().values(
         status = "Rejected",
         ambulance = None
