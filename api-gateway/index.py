@@ -233,7 +233,7 @@ async def check_query_params_and_body(
     request_method=app.put,
     service_url=SERVICE_URL_AMBULANCE,
     gateway_path='/ambulances/update_ambulance/{id}',
-    service_path='/{id}',
+    service_path='/update/{id}',
     status_code=status.HTTP_200_OK,
     body_params=["test_body"],
     response_model=str,
