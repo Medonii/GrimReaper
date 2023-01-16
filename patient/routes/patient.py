@@ -1,5 +1,4 @@
 from typing import Union
-from ambulance.models.ambulance import ambulances
 from fastapi import APIRouter, HTTPException, status, Request
 from models.patient import patients
 from config.db import conn
