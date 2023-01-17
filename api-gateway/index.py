@@ -397,6 +397,21 @@ async def check_query_params_and_body(
 @route(
     request_method=app.put,
     service_url=SERVICE_URL_PATIENT,
+    gateway_path='/patients/suggest/{id}',
+    service_path='/suggest/{id}',
+    status_code=status.HTTP_200_OK,
+    response_model=str,
+)
+async def check_query_params_and_body(
+        id: int,
+        request: Request, 
+        response: Response,
+):
+    pass
+
+@route(
+    request_method=app.put,
+    service_url=SERVICE_URL_PATIENT,
     gateway_path='/patients/accept/{id}',
     service_path='/accept/{id}',
     status_code=status.HTTP_200_OK,

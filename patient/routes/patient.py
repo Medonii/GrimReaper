@@ -1,6 +1,7 @@
 from typing import Union
 
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter, HTTPException, status, Request, Depends, Security
+from fastapi.security import OAuth2PasswordBearer
 from models.patient import patients
 from config.db import conn
 from schemas.patient import Patient
@@ -10,19 +11,35 @@ import gmaps
 import googlemaps
 from datetime import datetime
 
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="http://user:80/token",
+    scopes={"admin": "Do everything.", "operator": "Operate requests", "ambulance_driver": "Read requests, update ambulance."},
+    )
+
 patient = APIRouter()
 
 @patient.get('/')
-async def fetch_patient(ambulance: Union[str, None] = None):
-        if ambulance: return conn.execute(patients.select().where(patients.c.ambulance == ambulance)).fetchall()
-        else: return conn.execute(patients.select()).fetchall()
+async def fetch_patient(ambulance: Union[str, None] = None, token: str = Depends(oauth2_scheme)):
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return conn.execute(patients.select()).fetchall()
+    else:
+        return response.json()
+        
 
 @patient.get('/fetch/{id}')
-async def fetch_patient(id: int):
+async def fetch_patient(id: int, token: str = Depends(oauth2_scheme)):
     return conn.execute(patients.select().where(patients.c.id == id)).first()
 
 @patient.post('/create')
-async def create_patient(patient: Patient):
+async def create_patient(patient: Patient, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.name == patient.name)).first()
     if patient_db is not None:
             raise HTTPException(
@@ -35,10 +52,21 @@ async def create_patient(patient: Patient):
         address = patient.address,
         type = patient.type
     ))
-    return  "Patient created"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return  "Patient created"
+    else:
+        return response.json()
 
 @patient.put('/update/{id}')
-async def update_patient(id: int, patient: Patient):
+async def update_patient(id: int, patient: Patient, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
             raise HTTPException(
@@ -49,10 +77,21 @@ async def update_patient(id: int, patient: Patient):
         name = patient.name,
         address = patient.address
     ).where(patients.c.id == id))
-    return "Patient updated"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return "Patient updated"
+    else:
+        return response.json()
 
 @patient.delete('/delete/{id}')
-async def delete_patient(id: int):
+async def delete_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
             raise HTTPException(
@@ -60,10 +99,21 @@ async def delete_patient(id: int):
             detail="patient with this id doesn't exist"
         )
     conn.execute(patients.delete().where(patients.c.id == id))
-    return  "Patient deleted"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return  "Patient deleted"
+    else:
+        return response.json()
 
 @patient.put('/suggest/{id}')
-async def suggest_patient_ambulance(id: int):
+async def suggest_patient_ambulance(id: int, token: str = Depends(oauth2_scheme)):
 
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
@@ -72,7 +122,10 @@ async def suggest_patient_ambulance(id: int):
             detail="patient with this id doesn't exist"
         )
     url = 'http://ambulance:8000/'
-    response = requests.get(url)
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
     data = response.text
     parsed = json.loads(data)
 
@@ -113,10 +166,20 @@ async def suggest_patient_ambulance(id: int):
         ambulance = selected['tag']
     ).where(patients.c.id == id))
 
-    return  "Ambulance suggestion made"
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return  "Ambulance suggestion made"
+    else:
+        return response.json()
 
 @patient.put('/accept/{id}')
-async def accept_patient(id: int):
+async def accept_patient(id: int, token: str = Depends(oauth2_scheme)):
 
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
@@ -132,7 +195,10 @@ async def accept_patient(id: int):
     ).where(patients.c.id == id))
 
     url = 'http://ambulance:8000/'
-    response = requests.get(url)
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
     data = response.text
     parsed = json.loads(data)
 
@@ -140,12 +206,26 @@ async def accept_patient(id: int):
         if ambulance['tag'] == patient_db.ambulance:
             selected = ambulance
 
-    requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']))
+    requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']), headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
 
-    return  "Patient accepted"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return  "Patient accepted"
+    else:
+        return response.json()
 
 @patient.put('/reject/{id}')
-async def reject_patient(id: int):
+async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
             raise HTTPException(
@@ -157,10 +237,20 @@ async def reject_patient(id: int):
         ambulance = None
     ).where(patients.c.id == id))
 
-    return  "Patient rejected"
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return  "Patient rejected"
+    else:
+        return response.json()
 
 @patient.put('/start/{id}')
-async def start_patient(id: int):
+async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
             raise HTTPException(
@@ -170,10 +260,21 @@ async def start_patient(id: int):
     conn.execute(patients.update().values(
         status = "In Progress"
     ).where(patients.c.id == id))
-    return  "Patient in progress"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return  "Patient in progress"
+    else:
+        return response.json()
 
 @patient.put('/close/{id}')
-async def start_patient(id: int):
+async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
             raise HTTPException(
@@ -183,7 +284,18 @@ async def start_patient(id: int):
     conn.execute(patients.update().values(
         status = "Finished"
     ).where(patients.c.id == id))
-    return  "Patient finished"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    
+    if(response.json().get('nickname') is not None):
+        return  "Patient finished"
+    else:
+        return response.json()
 
 api_key = get_api_key()
 gmaps.configure(api_key)

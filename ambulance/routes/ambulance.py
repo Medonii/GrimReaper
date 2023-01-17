@@ -20,22 +20,33 @@ async def fetch_ambulances(token: str = Depends(oauth2_scheme)):
     url = 'http://user:80/users/me'
 
     response = requests.get(url, headers= {
-                        "Content-Type": "application/json",
-                        'Authorization': "Bearer " + token,
-                    })
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
 
     if(response.json().get('nickname') is not None):
-        return conn.execute(ambulances.select()).fetchall()
+       return conn.execute(ambulances.select()).fetchall()
     else:
         return response.json()
 
 @ambulance.get('/{id}')
-async def fetch_ambulance(id: int):
+async def fetch_ambulance(id: int, token: str = Depends(oauth2_scheme)):
 
-    return conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+
+    if(response.json().get('nickname') is not None):
+       return conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
+    else:
+       return response.json()
+        
 
 @ambulance.post('/')
-async def create_ambulance(ambulance: Ambulance):
+async def create_ambulance(ambulance: Ambulance, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == ambulance.tag)).first()
     if ambulance_db is not None:
             raise HTTPException(
@@ -48,10 +59,22 @@ async def create_ambulance(ambulance: Ambulance):
         status = 'Free',
         position = ambulance.position
     ))
-    return  "Ambulance created"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+
+    if(response.json().get('nickname') is not None):
+       return  "Ambulance created"
+    else:
+       return response.json()
+    
 
 @ambulance.put('/update/{id}')
-async def update_ambulance(id: int, ambulance: Ambulance):
+async def update_ambulance(id: int, ambulance: Ambulance, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
             raise HTTPException(
@@ -63,10 +86,22 @@ async def update_ambulance(id: int, ambulance: Ambulance):
         type = ambulance.type,
         position = ambulance.position
     ).where(ambulances.c.id == id))
-    return  "Ambulance updated"
+    
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+
+    if(response.json().get('nickname') is not None):
+       return  "Ambulance updated"
+    else:
+       return response.json()
 
 @ambulance.put('/set_busy_status/{id}')
-async def set_ambulance_as_busy(id: int):
+async def set_ambulance_as_busy(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
             raise HTTPException(
@@ -76,10 +111,22 @@ async def set_ambulance_as_busy(id: int):
     conn.execute(ambulances.update().values(
         status = 'Busy'
     ).where(ambulances.c.id == id))
-    return  "Ambulance set as busy"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+
+    if(response.json().get('nickname') is not None):
+       return  "Ambulance set as busy"
+    else:
+       return response.json()
+    
 
 @ambulance.put('/make_available/{id}')
-async def make_available(id: int):
+async def make_available(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
             raise HTTPException(
@@ -89,10 +136,21 @@ async def make_available(id: int):
     conn.execute(ambulances.update().values(
         status = 'Free'
     ).where(ambulances.c.id == id))
-    return  "Ambulanced made available"
+    
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+
+    if(response.json().get('nickname') is not None):
+       return  "Ambulanced made available"
+    else:
+       return response.json()
 
 @ambulance.put('/exclude/{id}')
-async def exclude_ambulance(id: int):
+async def exclude_ambulance(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
             raise HTTPException(
@@ -102,10 +160,22 @@ async def exclude_ambulance(id: int):
     conn.execute(ambulances.update().values(
         status = 'Not Available'
     ).where(ambulances.c.id == id))
-    return  "Ambulance excluded"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+
+    if(response.json().get('nickname') is not None):
+       return  "Ambulance excluded"
+    else:
+       return response.json()
+    
 
 @ambulance.delete('/{id}')
-async def delete_ambulance(id: int):
+async def delete_ambulance(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
             raise HTTPException(
@@ -113,4 +183,16 @@ async def delete_ambulance(id: int):
             detail="ambulance with this id doesn't exist"
         )
     conn.execute(ambulances.delete().where(ambulances.c.id == id))
-    return  "Ambulance deleted"
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+
+    if(response.json().get('nickname') is not None):
+       return  "Ambulance deleted"
+    else:
+       return response.json()
+    
