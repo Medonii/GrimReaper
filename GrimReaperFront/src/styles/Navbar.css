@@ -1,0 +1,80 @@
+*,*::after, *::before{
+    margin: 0;
+    box-sizing: border-box;
+}
+html{
+    font-size: 62.5%;
+}
+body{
+    font-size: 1.6rem;
+}
+
+li{
+    list-style: none;
+}
+a{
+    text-decoration: none;
+    color: darkgrey;
+}
+div{
+    text-decoration: none;
+    color: darkgrey;
+}
+.nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 8vh;
+    background: #1a2b3d;
+}
+.nav_menu{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 3rem;
+}
+.nav_toggler div{
+    width: 3.5rem;
+    height: 0.3rem;
+    margin: 0.5rem;
+    background: darkgrey;
+    transition: 0.4s ease-in;
+}
+.nav_toggler{
+    cursor: pointer;
+    display: none;
+}
+@media screen and (max-width: 768px){
+    .nav_toggler{
+        display: block;
+    }
+    .nav_menu{
+        position: fixed;
+        top: 7vh;
+        right: 0;
+        width: 50%;
+        height: 93vh;
+        background: #1a2b3d;
+        flex-direction: column;
+        transform: translateX(100%);
+        transition: 0.5s ease-in;
+    }
+}
+.nav_active{
+    transform: translateX(0);
+}
+.toggle .line1{
+    transform: rotate(-45deg) translate(-4px, 5px);
+}
+.toggle .line2{
+    opacity: 0;
+}
+.toggle .line3{
+    transform: rotate(45deg) translate(-4px, -5px);
+}
+.button{
+    text-decoration: none;
+    color: darkgrey;
+    background: #1a2b3d;
+    font-size: 1.6rem;
+}

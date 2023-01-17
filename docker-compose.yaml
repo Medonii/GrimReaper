@@ -1,4 +1,13 @@
 services:
+
+  GrimReaperFront:
+    container_name: react-app
+    image: docker-react-i
+    build:
+      context: GrimReaperFront
+    ports:
+      - "3000:3000"
+
   patient:
     build:
       context: patient
@@ -13,7 +22,7 @@ services:
 
   user:
     build: 
-      context: ./user
+      context: user
       dockerfile: Dockerfile
     container_name: usercontainer
     command: uvicorn user.index:app --host 0.0.0.0 --port 80 --reload --reload-include *
@@ -25,7 +34,7 @@ services:
 
   ambulance:
     build: 
-      context: ./ambulance
+      context: ambulance
       dockerfile: Dockerfile
     container_name: ambulancecontainer
     command: uvicorn ambulance.index:app --host 0.0.0.0 --port 8000 --reload --reload-include *
@@ -36,7 +45,7 @@ services:
   
   api-gateway:
     build: 
-      context: ./api-gateway
+      context: api-gateway
       dockerfile: Dockerfile
     container_name: api-gatewaycontainer
     command: uvicorn api-gateway.index:app --host 0.0.0.0 --port 8080 --reload --reload-include *
@@ -46,6 +55,7 @@ services:
       - .:/GrimReaper/api-gateway
 
 
+<<<<<<< HEAD
   master:
     image: locustio/locust
     ports:
@@ -58,3 +68,10 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/locustfile.py --worker --master-host master
+=======
+
+
+  
+
+
+>>>>>>> f69cefd19c1115c098aac7ca670749c35015d18e

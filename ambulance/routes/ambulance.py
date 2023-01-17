@@ -7,25 +7,40 @@ import requests
 
 ambulance = APIRouter()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> f69cefd19c1115c098aac7ca670749c35015d18e
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="http://user:80/token",
     scopes={"admin": "Do everything.", "operator": "Operate requests", "ambulance_driver": "Read requests, update ambulance."},
     )
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> f69cefd19c1115c098aac7ca670749c35015d18e
 @ambulance.get('/')
 async def fetch_ambulances(token: str = Depends(oauth2_scheme)):
 
     url = 'http://user:80/users/me'
 
     response = requests.get(url, headers= {
+<<<<<<< HEAD
                        "Content-Type": "application/json",
                        'Authorization': "Bearer " + token,
                    })
 
     if(response.json().get('nickname') is not None):
        return conn.execute(ambulances.select()).fetchall()
+=======
+                        "Content-Type": "application/json",
+                        'Authorization': "Bearer " + token,
+                    })
+
+    if(response.json().get('nickname') is not None):
+        return conn.execute(ambulances.select()).fetchall()
+>>>>>>> f69cefd19c1115c098aac7ca670749c35015d18e
     else:
         return response.json()
 

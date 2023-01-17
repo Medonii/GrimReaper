@@ -1,7 +1,11 @@
 from typing import Union
+<<<<<<< HEAD
 
 from fastapi import APIRouter, HTTPException, status, Request, Depends, Security
 from fastapi.security import OAuth2PasswordBearer
+=======
+from fastapi import APIRouter, HTTPException, status, Request
+>>>>>>> f69cefd19c1115c098aac7ca670749c35015d18e
 from models.patient import patients
 from config.db import conn
 from schemas.patient import Patient
@@ -232,6 +236,10 @@ async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
         )
+
+    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == patient_db.name)).first()
+    requests.put('http://ambulance:8000/make_available/' + str(ambulance_db['id']))
+
     conn.execute(patients.update().values(
         status = "Rejected",
         ambulance = None
