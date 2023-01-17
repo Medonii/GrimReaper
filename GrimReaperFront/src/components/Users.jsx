@@ -19,7 +19,8 @@ const Users = () => {
     const handleDelete = async (id) => {
         const requestOptions = {
             method: "DELETE",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8080/users/delete_user/${id}`, requestOptions);
         if(!response.ok) {
@@ -32,7 +33,8 @@ const Users = () => {
     const getUsers = async() => {
         const requestOptions = {
             method: "GET",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch("http://localhost:8080/users", requestOptions);
         if (!response.ok){

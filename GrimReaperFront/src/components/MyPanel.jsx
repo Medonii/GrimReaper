@@ -13,7 +13,8 @@ const MyPanel = () => {
     const handleReject = async (id) => {
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8080/patients/reject/${id}`, requestOptions);
         if(!response.ok) {
@@ -26,7 +27,8 @@ const MyPanel = () => {
     const handleAccept = async (id) => {
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8008/accept/${id}`, requestOptions);
         if(!response.ok) {
@@ -39,7 +41,8 @@ const MyPanel = () => {
     const handleStart = async (id) => {
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8080/patients/start/${id}`, requestOptions);
         if(!response.ok) {
@@ -52,7 +55,8 @@ const MyPanel = () => {
     const handleFinish = async (id) => {
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8080/patients/close/${id}`, requestOptions);
         if(!response.ok) {
@@ -65,7 +69,8 @@ const MyPanel = () => {
     const getMyPatients = async() => {
         const requestOptions = {
             method: "GET",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8008/?ambulance=`+ ambulance, requestOptions);
         if (!response.ok){

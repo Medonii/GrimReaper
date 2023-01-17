@@ -9,7 +9,8 @@ const AmbulanceModal = ({active, handleModal, token, id, setErrorMessage}) => {
         const getAmbulance = async () => {
             const requestOptions = {
                 method: "GET",
-                headers: {"Content-Type": "application/json"},
+                headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             };
             const response = await fetch(`http://localhost:8080/ambulances/${id}`)
             if(!response) {
@@ -37,7 +38,8 @@ const AmbulanceModal = ({active, handleModal, token, id, setErrorMessage}) => {
         e.preventDefault();
         const requestOptions = {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             body: JSON.stringify({tag: tag, type: type, position: position})
         };
         const response = await fetch("http://localhost:8080/ambulances/create", requestOptions);
@@ -53,7 +55,8 @@ const AmbulanceModal = ({active, handleModal, token, id, setErrorMessage}) => {
         e.preventDefault();
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             body: JSON.stringify({tag: tag, type: type, position: position})
         };
         const response = await fetch(`http://localhost:8000/update/${id}`, requestOptions);

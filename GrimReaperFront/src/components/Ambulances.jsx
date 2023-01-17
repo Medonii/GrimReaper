@@ -19,7 +19,8 @@ const Ambulances = () => {
     const handleDelete = async (id) => {
         const requestOptions = {
             method: "DELETE",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8080/ambulances/delete_ambulance/${id}`, requestOptions);
         if(!response.ok) {

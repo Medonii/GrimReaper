@@ -10,7 +10,8 @@ const PatientModal = ({active, handleModal, token, id, setErrorMessage}) => {
         const getPatient = async () => {
             const requestOptions = {
                 method: "GET",
-                headers: {"Content-Type": "application/json"},
+                headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             };
             const response = await fetch(`http://localhost:8008/${id}`)
             if(!response) {
@@ -39,7 +40,8 @@ const PatientModal = ({active, handleModal, token, id, setErrorMessage}) => {
         e.preventDefault();
         const requestOptions = {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             body: JSON.stringify({name: name, address: address, people: noPeople, type: type})
         };
         const response = await fetch("http://localhost:8008/create", requestOptions);
@@ -55,7 +57,8 @@ const PatientModal = ({active, handleModal, token, id, setErrorMessage}) => {
         e.preventDefault();
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             body: JSON.stringify({name: name, address: address, people: noPeople, type: type})
         };
         const response = await fetch(`http://localhost:8008/update/${id}`, requestOptions);

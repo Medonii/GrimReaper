@@ -19,9 +19,10 @@ const Patients = () => {
     const handleDelete = async (id) => {
         const requestOptions = {
             method: "DELETE",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8008/delete/${id}`, requestOptions);
+        const response = await fetch(`http://localhost:8080/patients/delete/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to delete patient")
         } else {
@@ -32,7 +33,8 @@ const Patients = () => {
     const handleSuggest = async (id) => {
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
         const response = await fetch(`http://localhost:8008/suggest/${id}`, requestOptions);
         if(!response.ok) {
@@ -45,9 +47,10 @@ const Patients = () => {
     const getPatients = async() => {
         const requestOptions = {
             method: "GET",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
         };
-        const response = await fetch("http://localhost:8008/");
+        const response = await fetch("http://localhost:8080/patients", requestOptions);
         if (!response.ok){
             setErrorMessage("Patients cannot be loaded.");
         } else {

@@ -1,11 +1,7 @@
 from typing import Union
-<<<<<<< HEAD
-
+from ambulance.models.ambulance import ambulances
 from fastapi import APIRouter, HTTPException, status, Request, Depends, Security
 from fastapi.security import OAuth2PasswordBearer
-=======
-from fastapi import APIRouter, HTTPException, status, Request
->>>>>>> f69cefd19c1115c098aac7ca670749c35015d18e
 from models.patient import patients
 from config.db import conn
 from schemas.patient import Patient
@@ -166,7 +162,7 @@ async def suggest_patient_ambulance(id: int, token: str = Depends(oauth2_scheme)
         )
 
     conn.execute(patients.update().values(
-        status = "Ambulance Suggestion Made",
+        status = "Ambulance Assigned",
         ambulance = selected['tag']
     ).where(patients.c.id == id))
 
@@ -238,7 +234,10 @@ async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
         )
 
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == patient_db.name)).first()
-    requests.put('http://ambulance:8000/make_available/' + str(ambulance_db['id']))
+    requests.put('http://ambulance:8000/make_available/' + str(ambulance_db['id']), headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
 
     conn.execute(patients.update().values(
         status = "Rejected",

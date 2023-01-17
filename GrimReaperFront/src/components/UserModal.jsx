@@ -10,7 +10,8 @@ const UserModal = ({active, handleModal, token, id, setErrorMessage}) => {
         const getUsers = async () => {
             const requestOptions = {
                 method: "GET",
-                headers: {"Content-Type": "application/json"},
+                headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             };
             const response = await fetch(`http://localhost:8080/users/${id}`, requestOptions)
             if(!response) {
@@ -39,7 +40,8 @@ const UserModal = ({active, handleModal, token, id, setErrorMessage}) => {
         e.preventDefault();
         const requestOptions = {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             body: JSON.stringify({nickname: nickname, password: password, role: role, ambulance: ambulance})
         };
         const response = await fetch("http://localhost:8080/users/create", requestOptions);
@@ -55,7 +57,8 @@ const UserModal = ({active, handleModal, token, id, setErrorMessage}) => {
         e.preventDefault();
         const requestOptions = {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json",
+                        Authorization: "Bearer " + token},
             body: JSON.stringify({nickname: nickname, password: password, role: role, ambulance: ambulance})
         };
         const response = await fetch(`http://localhost:8080/users/update_user/${id}`, requestOptions);
