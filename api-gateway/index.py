@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm, SecurityScopes
 from starlette import status
 from starlette.exceptions import HTTPException
-from schemas.gateway import User, UserBody, Token, Ambulance, AmbulanceBody, Patient
+from schemas.gateway import User, UserBody, Token, Ambulance, AmbulanceBody, Patient, PatientBody
 
 app = FastAPI(title='API Gateway')
 
@@ -318,7 +318,7 @@ async def check_query_params_and_body(
     service_path='/',
     status_code=status.HTTP_200_OK,
     override_headers=False,
-    response_model=List[Patient],
+    response_model=List[PatientBody],
 )
 async def check_query_params_and_body(
         request: Request, response: Response
