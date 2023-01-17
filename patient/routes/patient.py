@@ -233,7 +233,7 @@ async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
             detail="patient with this id doesn't exist"
         )
 
-    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == patient_db.name)).first()
+    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == patient_db.ambulance)).first()
     requests.put('http://ambulance:8000/make_available/' + str(ambulance_db['id']), headers= {
                        "Content-Type": "application/json",
                        'Authorization': "Bearer " + token,
