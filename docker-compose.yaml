@@ -55,7 +55,6 @@ services:
       - .:/GrimReaper/api-gateway
 
 
-<<<<<<< HEAD
   master:
     image: locustio/locust
     ports:
@@ -68,10 +67,8 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/locustfile.py --worker --master-host master
-=======
 
 
   
 
 
->>>>>>> f69cefd19c1115c098aac7ca670749c35015d18e
