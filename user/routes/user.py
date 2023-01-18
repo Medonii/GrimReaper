@@ -4,6 +4,8 @@ from models.user import users
 from config.db import conn
 from schemas.user import User
 from auth.user_auth import get_password_hash
+import sentry_sdk
+
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="token",
@@ -27,6 +29,7 @@ async def fetch_user(id: int, token: str = Depends(oauth2_scheme)):
 async def create_user(user: User, token: str = Depends(oauth2_scheme)):
     user_db = conn.execute(users.select().where(users.c.nickname == user.nickname)).first()
     if user_db is not None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, User with this nickname already exists"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this nickname already exists"
@@ -42,6 +45,7 @@ async def create_user(user: User, token: str = Depends(oauth2_scheme)):
 async def update_user(id: int, user: User, token: str = Depends(oauth2_scheme)):
     user_db = conn.execute(users.select().where(users.c.id == id)).first()
     if user_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, User with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this id doesn't exist"
@@ -58,6 +62,7 @@ async def update_user(id: int, user: User, token: str = Depends(oauth2_scheme)):
 async def delete_user(id: int, token: str = Depends(oauth2_scheme)):
     user_db = conn.execute(users.select().where(users.c.id == id)).first()
     if user_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, User with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this id doesn't exist"

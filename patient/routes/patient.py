@@ -10,6 +10,7 @@ from models.import_api import get_api_key
 import gmaps
 import googlemaps
 from datetime import datetime
+import sentry_sdk
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="http://user:80/token",
@@ -31,6 +32,7 @@ async def fetch_patient(ambulance: Union[str, None] = None, token: str = Depends
     if(response.json().get('nickname') is not None):
         return conn.execute(patients.select()).fetchall()
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_UNAUTHORIZED, Not authorized"))
         return response.json()
         
 
@@ -42,6 +44,7 @@ async def fetch_patient(id: int, token: str = Depends(oauth2_scheme)):
 async def create_patient(patient: Patient, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.name == patient.name)).first()
     if patient_db is not None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, Patient request with this name already exists."))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Patient request with this name already exists."
@@ -63,12 +66,14 @@ async def create_patient(patient: Patient, token: str = Depends(oauth2_scheme)):
     if(response.json().get('nickname') is not None):
         return  "Patient created"
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_UNAUTHORIZED, Not authorized"))
         return response.json()
 
 @patient.put('/update/{id}')
 async def update_patient(id: int, patient: Patient, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, patient with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
@@ -88,12 +93,14 @@ async def update_patient(id: int, patient: Patient, token: str = Depends(oauth2_
     if(response.json().get('nickname') is not None):
         return "Patient updated"
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
         return response.json()
 
 @patient.delete('/delete/{id}')
 async def delete_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, patient with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
@@ -110,6 +117,7 @@ async def delete_patient(id: int, token: str = Depends(oauth2_scheme)):
     if(response.json().get('nickname') is not None):
         return  "Patient deleted"
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
         return response.json()
 
 @patient.put('/suggest/{id}')
@@ -117,6 +125,7 @@ async def suggest_patient_ambulance(id: int, token: str = Depends(oauth2_scheme)
 
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, patient with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
@@ -176,6 +185,7 @@ async def suggest_patient_ambulance(id: int, token: str = Depends(oauth2_scheme)
     if(response.json().get('nickname') is not None):
         return  "Ambulance suggestion made"
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
         return response.json()
 
 @patient.put('/accept/{id}')
@@ -183,6 +193,7 @@ async def accept_patient(id: int, token: str = Depends(oauth2_scheme)):
 
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, patient with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
@@ -222,12 +233,14 @@ async def accept_patient(id: int, token: str = Depends(oauth2_scheme)):
     if(response.json().get('nickname') is not None):
         return  "Patient accepted"
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
         return response.json()
 
 @patient.put('/reject/{id}')
 async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, patient with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
@@ -254,12 +267,14 @@ async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
     if(response.json().get('nickname') is not None):
         return  "Patient rejected"
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
         return response.json()
 
 @patient.put('/start/{id}')
 async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, patient with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
@@ -278,12 +293,14 @@ async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
     if(response.json().get('nickname') is not None):
         return  "Patient in progress"
     else:
+        sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
         return response.json()
 
 @patient.put('/close/{id}')
 async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
     if patient_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, patient with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
@@ -299,10 +316,15 @@ async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
                        'Authorization': "Bearer " + token,
                    })
     
+
     if(response.json().get('nickname') is not None):
         return  "Patient finished"
     else:
-        return response.json()
+        sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
 
 api_key = get_api_key()
 gmaps.configure(api_key)

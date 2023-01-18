@@ -4,6 +4,7 @@ from models.ambulance import ambulances
 from config.db import conn
 from schemas.ambulance import Ambulance
 import requests
+import sentry_sdk
 
 ambulance = APIRouter()
 
@@ -46,11 +47,13 @@ async def fetch_ambulance(id: int, token: str = Depends(oauth2_scheme)):
 @ambulance.post('/')
 async def create_ambulance(ambulance: Ambulance, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == ambulance.tag)).first()
-    if ambulance_db is not None:
+    if ambulance_db is not None:   
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, ambulance with this tag already exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ambulance with this tag already exist"
         )
+    
     conn.execute(ambulances.insert().values(
         tag = ambulance.tag,
         type = ambulance.type,
@@ -75,6 +78,7 @@ async def create_ambulance(ambulance: Ambulance, token: str = Depends(oauth2_sch
 async def update_ambulance(id: int, ambulance: Ambulance, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, ambulance with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ambulance with this id doesn't exist"
@@ -102,6 +106,7 @@ async def update_ambulance(id: int, ambulance: Ambulance, token: str = Depends(o
 async def set_ambulance_as_busy(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, ambulance with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ambulance with this id doesn't exist"
@@ -127,6 +132,7 @@ async def set_ambulance_as_busy(id: int, token: str = Depends(oauth2_scheme)):
 async def make_available(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, ambulance with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ambulance with this id doesn't exist"
@@ -151,6 +157,7 @@ async def make_available(id: int, token: str = Depends(oauth2_scheme)):
 async def exclude_ambulance(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, ambulance with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ambulance with this id doesn't exist"
@@ -176,6 +183,7 @@ async def exclude_ambulance(id: int, token: str = Depends(oauth2_scheme)):
 async def delete_ambulance(id: int, token: str = Depends(oauth2_scheme)):
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.id == id)).first()
     if ambulance_db is None:
+            sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, ambulance with this id doesn't exist"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ambulance with this id doesn't exist"

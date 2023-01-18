@@ -10,6 +10,9 @@ from schemas.user import User
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+import sentry_sdk
+
+
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -90,9 +93,11 @@ async def get_current_user(security_scopes: SecurityScopes, token: str = Depends
         raise credentials_exception
     user = get_user(nickname=token_data.username)
     if user is None:
+        sentry_sdk.capture_exception(Exception("HTTP_401_UNAUTHORIZED, Could not validate credentials"))
         raise credentials_exception
     for scope in security_scopes.scopes:
         if scope not in token_data.scopes:
+            sentry_sdk.capture_exception(Exception("HTTP_401_UNAUTHORIZED, Not enough permissions"))
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Not enough permissions",
@@ -105,6 +110,7 @@ async def get_current_user(security_scopes: SecurityScopes, token: str = Depends
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
+        sentry_sdk.capture_exception(Exception("HTTP_401_UNAUTHORIZED, Incorrect nickname or password"))
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect nickname or password",
@@ -120,6 +126,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 async def create_user(form_data: OAuth2PasswordRequestForm = Depends()):
     user_db = conn.execute(users.select().where(users.c.nickname == form_data.username)).first()
     if user_db is not None:
+            sentry_sdk.capture_exception(Exception("HTTP_401_UNAUTHORIZED, User with this nickname already exists"))
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this nickname already exists"
