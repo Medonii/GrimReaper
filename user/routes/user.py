@@ -26,7 +26,7 @@ async def fetch_user(id: int, token: str = Depends(oauth2_scheme)):
     return conn.execute(users.select().where(users.c.id == id)).first()
 
 @user.post('/')
-async def create_user(user: User, token: str = Depends(oauth2_scheme)):
+async def create_user(user: User):
     user_db = conn.execute(users.select().where(users.c.nickname == user.nickname)).first()
     if user_db is not None:
             sentry_sdk.capture_exception(Exception("HTTP_400_BAD_REQUEST, User with this nickname already exists"))
