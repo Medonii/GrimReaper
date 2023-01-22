@@ -49,7 +49,7 @@ class PatientBody(BaseModel):
     id: int
     name: Union[str, None]
     address: Union[str, None]
-    ambulance: Union[str, None] = None
+    ambulance: Union[str, None]
     status: Union[Statuses, None] = None
     people: Union[int, None] = 1
     type: Union[str, None]
