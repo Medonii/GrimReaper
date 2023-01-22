@@ -14,6 +14,17 @@ from fastapi.security import OAuth2PasswordRequestForm, SecurityScopes
 from starlette import status
 from starlette.exceptions import HTTPException
 from schemas.gateway import User, UserBody, Token, Ambulance, AmbulanceBody, Patient, PatientBody
+import sentry_sdk
+
+
+sentry_sdk.init(
+    dsn="https://71d144d574f344178bab602d68c5e995@o4504526357790721.ingest.sentry.io/4504526359101440",
+
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production,
+    traces_sample_rate=1.0,
+)
 
 app = FastAPI(title='API Gateway')
 

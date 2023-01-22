@@ -9,3 +9,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 requests
 fastapi_gateway
+sentry-sdk[fastapi]

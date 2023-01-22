@@ -12,3 +12,4 @@ gmaps
 googlemaps
 googlemaps
 datetime
+sentry-sdk[fastapi]
