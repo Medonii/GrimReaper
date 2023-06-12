@@ -13,7 +13,7 @@ const PatientModal = ({active, handleModal, token, id, setErrorMessage}) => {
                 headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
             };
-            const response = await fetch(`http://localhost:8008/${id}`)
+            const response = await fetch(`http://patient-service:8008/${id}`)
             if(!response) {
                 setErrorMessage("Could not retrieve patient request data.")
             } else {
@@ -44,7 +44,7 @@ const PatientModal = ({active, handleModal, token, id, setErrorMessage}) => {
                         Authorization: "Bearer " + token},
             body: JSON.stringify({name: name, address: address, people: noPeople, type: type})
         };
-        const response = await fetch("http://localhost:8008/create", requestOptions);
+        const response = await fetch("http://patient-service:8008/create", requestOptions);
         if(!response) {
             setErrorMessage("Patient cannot be created")
         } else {
@@ -61,7 +61,7 @@ const PatientModal = ({active, handleModal, token, id, setErrorMessage}) => {
                         Authorization: "Bearer " + token},
             body: JSON.stringify({name: name, address: address, people: noPeople, type: type})
         };
-        const response = await fetch(`http://localhost:8008/update/${id}`, requestOptions);
+        const response = await fetch(`http://patient-service:8008/update/${id}`, requestOptions);
         if(!response){
             setErrorMessage("Could not update patient");
         } else {

@@ -22,7 +22,7 @@ const Patients = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8080/patients/delete/${id}`, requestOptions);
+        const response = await fetch(`http://api-gateway-service:8080/patients/delete/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to delete patient")
         } else {
@@ -36,7 +36,7 @@ const Patients = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8008/suggest/${id}`, requestOptions);
+        const response = await fetch(`http://patient-service:8008/suggest/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to assign ambulance")
         } else {
@@ -50,7 +50,7 @@ const Patients = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch("http://localhost:8080/patients", requestOptions);
+        const response = await fetch("http://api-gateway-service:8080/patients", requestOptions);
         if (!response.ok){
             setErrorMessage("Patients cannot be loaded.");
         } else {

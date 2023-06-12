@@ -13,7 +13,7 @@ from datetime import datetime
 import sentry_sdk
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="http://user:80/token",
+    tokenUrl="http://user-service:80/token",
     scopes={"admin": "Do everything.", "operator": "Operate requests", "ambulance_driver": "Read requests, update ambulance."},
     )
 
@@ -22,7 +22,7 @@ patient = APIRouter()
 @patient.get('/')
 async def fetch_patient(ambulance: Union[str, None] = None, token: str = Depends(oauth2_scheme)):
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -56,7 +56,7 @@ async def create_patient(patient: Patient, token: str = Depends(oauth2_scheme)):
         type = patient.type
     ))
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -83,7 +83,7 @@ async def update_patient(id: int, patient: Patient, token: str = Depends(oauth2_
         address = patient.address
     ).where(patients.c.id == id))
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -107,7 +107,7 @@ async def delete_patient(id: int, token: str = Depends(oauth2_scheme)):
         )
     conn.execute(patients.delete().where(patients.c.id == id))
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -130,7 +130,7 @@ async def suggest_patient_ambulance(id: int, token: str = Depends(oauth2_scheme)
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="patient with this id doesn't exist"
         )
-    url = 'http://ambulance:8000/'
+    url = 'http://ambulance-service:8000/'
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
                        'Authorization': "Bearer " + token,
@@ -175,7 +175,7 @@ async def suggest_patient_ambulance(id: int, token: str = Depends(oauth2_scheme)
         ambulance = selected['tag']
     ).where(patients.c.id == id))
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -205,7 +205,7 @@ async def accept_patient(id: int, token: str = Depends(oauth2_scheme)):
         status = "Ambulance Assigned"
     ).where(patients.c.id == id))
 
-    url = 'http://ambulance:8000/'
+    url = 'http://ambulance-service:8000/'
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
                        'Authorization': "Bearer " + token,
@@ -217,13 +217,13 @@ async def accept_patient(id: int, token: str = Depends(oauth2_scheme)):
         if ambulance['tag'] == patient_db.ambulance:
             selected = ambulance
 
-    requests.put('http://ambulance:8000/set_busy_status/' + str(selected['id']), headers= {
+    requests.put('http://ambulance-service:8000/set_busy_status/' + str(selected['id']), headers= {
                        "Content-Type": "application/json",
                        'Authorization': "Bearer " + token,
                    })
 
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -247,7 +247,7 @@ async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
         )
 
     ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == patient_db.ambulance)).first()
-    requests.put('http://ambulance:8000/make_available/' + str(ambulance_db['id']), headers= {
+    requests.put('http://ambulance-service:8000/make_available/' + str(ambulance_db['id']), headers= {
                        "Content-Type": "application/json",
                        'Authorization': "Bearer " + token,
                    })
@@ -257,7 +257,7 @@ async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
         ambulance = None
     ).where(patients.c.id == id))
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -283,7 +283,7 @@ async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
         status = "In Progress"
     ).where(patients.c.id == id))
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",
@@ -309,7 +309,7 @@ async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
         status = "Finished"
     ).where(patients.c.id == id))
 
-    url = 'http://user:80/users/me'
+    url = 'http://user-service:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",

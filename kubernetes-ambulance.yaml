@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ambulance-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ambulance
+  template:
+    metadata:
+      labels:
+        app: ambulance
+    spec:
+      containers:
+      - name: ambulancecontainer
+        image: medonii/grimreaper:grimreaper-ambulance
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: db_root_password
+          valueFrom:
+            secretKeyRef:
+              name: grimreaper-secrets
+              key: db_root_password
+        - name: db_name
+          value: GrimReaper
+      imagePullSecrets:
+      - name: medonii
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ambulance-service
+spec:
+  selector:
+    app: ambulance
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: LoadBalancer

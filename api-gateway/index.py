@@ -15,7 +15,7 @@ from starlette import status
 from starlette.exceptions import HTTPException
 from schemas.gateway import User, UserBody, Token, Ambulance, AmbulanceBody, Patient, PatientBody
 import sentry_sdk
-
+import os
 
 sentry_sdk.init(
     dsn="https://71d144d574f344178bab602d68c5e995@o4504526357790721.ingest.sentry.io/4504526359101440",
@@ -36,9 +36,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SERVICE_URL_USER = "http://user:80"
-SERVICE_URL_AMBULANCE = "http://ambulance:8000"
-SERVICE_URL_PATIENT = "http://patient:8008"
+
+SERVICE_URL_USER = "http://user-service:80"
+SERVICE_URL_AMBULANCE = "http://ambulance-service:8000"
+SERVICE_URL_PATIENT = "http://patient-service:8008"
 
 API_KEY_NAME = "x-api-key"
 

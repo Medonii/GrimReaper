@@ -13,7 +13,7 @@ const UserModal = ({active, handleModal, token, id, setErrorMessage}) => {
                 headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
             };
-            const response = await fetch(`http://localhost:8080/users/${id}`, requestOptions)
+            const response = await fetch(`http://api-gateway-service:8080/users/${id}`, requestOptions)
             if(!response) {
                 setErrorMessage("Could not retrieve user data.")
             } else {
@@ -44,7 +44,7 @@ const UserModal = ({active, handleModal, token, id, setErrorMessage}) => {
                         Authorization: "Bearer " + token},
             body: JSON.stringify({nickname: nickname, password: password, role: role, ambulance: ambulance})
         };
-        const response = await fetch("http://localhost:8080/users/create", requestOptions);
+        const response = await fetch("http://api-gateway-service:8080/users/create", requestOptions);
         if(!response) {
             setErrorMessage("User cannot be created")
         } else {
@@ -61,7 +61,7 @@ const UserModal = ({active, handleModal, token, id, setErrorMessage}) => {
                         Authorization: "Bearer " + token},
             body: JSON.stringify({nickname: nickname, password: password, role: role, ambulance: ambulance})
         };
-        const response = await fetch(`http://localhost:8080/users/update_user/${id}`, requestOptions);
+        const response = await fetch(`http://api-gateway-service:8080/users/update_user/${id}`, requestOptions);
         if(!response){
             setErrorMessage("Could not update user");
         } else {

@@ -12,7 +12,7 @@ const AmbulanceModal = ({active, handleModal, token, id, setErrorMessage}) => {
                 headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
             };
-            const response = await fetch(`http://localhost:8080/ambulances/${id}`)
+            const response = await fetch(`http://ambulance-service:8080/ambulances/${id}`)
             if(!response) {
                 setErrorMessage("Could not retrieve ambulance data.")
             } else {
@@ -42,7 +42,7 @@ const AmbulanceModal = ({active, handleModal, token, id, setErrorMessage}) => {
                         Authorization: "Bearer " + token},
             body: JSON.stringify({tag: tag, type: type, position: position})
         };
-        const response = await fetch("http://localhost:8080/ambulances/create", requestOptions);
+        const response = await fetch("http://api-gateway-service:8080/ambulances/create", requestOptions);
         if(!response) {
             setErrorMessage("Ambulance cannot be created")
         } else {
@@ -59,7 +59,7 @@ const AmbulanceModal = ({active, handleModal, token, id, setErrorMessage}) => {
                         Authorization: "Bearer " + token},
             body: JSON.stringify({tag: tag, type: type, position: position})
         };
-        const response = await fetch(`http://localhost:8000/update/${id}`, requestOptions);
+        const response = await fetch(`http://ambulance-service:8000/update/${id}`, requestOptions);
         if(!response){
             setErrorMessage("Could not update ambulance");
         } else {

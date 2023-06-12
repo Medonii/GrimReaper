@@ -22,7 +22,7 @@ const Users = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8080/users/delete_user/${id}`, requestOptions);
+        const response = await fetch(`http://api-gateway-service:8080/users/delete_user/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to delete user")
         } else {
@@ -36,7 +36,7 @@ const Users = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch("http://localhost:8080/users", requestOptions);
+        const response = await fetch("http://api-gateway-service:8080/users", requestOptions);
         if (!response.ok){
             setErrorMessage("Users cannot be loaded.");
         } else {

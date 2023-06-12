@@ -22,7 +22,7 @@ const Ambulances = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8080/ambulances/delete_ambulance/${id}`, requestOptions);
+        const response = await fetch(`http://api-gateway-service:8080/ambulances/delete_ambulance/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to delete ambulance")
         } else {
@@ -36,7 +36,7 @@ const Ambulances = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch("http://localhost:8000/", requestOptions);
+        const response = await fetch("http://ambulance-service:8000/", requestOptions);
         if (!response.ok){
             setErrorMessage("Ambulances cannot be loaded.");
         } else {

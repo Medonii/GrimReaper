@@ -25,7 +25,7 @@ const Login = () => {
             redirect: "follow"
         };
 
-        const response = await fetch("http://localhost/token", requestOptions)
+        const response = await fetch("http://user-service/token", requestOptions)
         const data = await response.json();
 
         if(!response.ok) {

@@ -16,7 +16,7 @@ const MyPanel = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8080/patients/reject/${id}`, requestOptions);
+        const response = await fetch(`http://api-gateway-service:8080/patients/reject/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to reject patient")
         } else {
@@ -30,7 +30,7 @@ const MyPanel = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8008/accept/${id}`, requestOptions);
+        const response = await fetch(`http://patient-service:8008/accept/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to accept patient request")
         } else {
@@ -44,7 +44,7 @@ const MyPanel = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8080/patients/start/${id}`, requestOptions);
+        const response = await fetch(`http://api-gateway-service:8080/patients/start/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to start work on patient")
         } else {
@@ -58,7 +58,7 @@ const MyPanel = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8080/patients/close/${id}`, requestOptions);
+        const response = await fetch(`http://api-gateway-service:8080/patients/close/${id}`, requestOptions);
         if(!response.ok) {
             setErrorMessage("Failed to close work on patient")
         } else {
@@ -72,7 +72,7 @@ const MyPanel = () => {
             headers: {"Content-Type": "application/json",
                         Authorization: "Bearer " + token},
         };
-        const response = await fetch(`http://localhost:8008/?ambulance=`+ ambulance, requestOptions);
+        const response = await fetch(`http://patient-service:8008/?ambulance=`+ ambulance, requestOptions);
         if (!response.ok){
             setErrorMessage("Patients cannot be loaded.");
         } else {

@@ -3,7 +3,7 @@ import random
 import string
 
 
-token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2N1c3Rlc3QiLCJzY29wZXMiOltdLCJleHAiOjE2NzM5NzU3MDN9.G3jc_qGH8QYvEgc-Pk27FFydC2U1HAia3eYDhjlsBF0"
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb2N1c3Rlc3QiLCJzY29wZXMiOltdLCJleHAiOjE2NzQzODQyNjZ9.trXB6hzlCPJmhTvY1j8wXiv_8sMBzb9zX-odkGw_7kY"
 
 class AppUser(HttpUser):
     wait_time = between(2,5)
@@ -75,7 +75,7 @@ class AppUser(HttpUser):
 
     @task
     def get_ambulance(self):
-        self.client.get("/ambulances/1", headers= {
+        self.client.get("/ambulances/5", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
@@ -89,8 +89,8 @@ class AppUser(HttpUser):
         self.client.post("/ambulances/create", json=
         {
         "tag": tag,
-        "type": type,
-        "position": "dluga 5, Krakow"
+        "type": "s",
+        "position": "dluga 10, Krakow"
         }, headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
@@ -101,10 +101,10 @@ class AppUser(HttpUser):
         tag = ''.join(random.choices(string.ascii_lowercase, k=5))
         type = ''.join(random.choices(string.ascii_lowercase, k=1))
         
-        self.client.put("/ambulances/update_ambulance/1", json=
+        self.client.put("/ambulances/update_ambulance/5", json=
         {
         "tag": tag,
-        "type": type,
+        "type": "s",
         "position": "dluga 5, Krakow"
         }, headers= {
                         "Content-Type": "application/json",
@@ -113,21 +113,21 @@ class AppUser(HttpUser):
 
     @task 
     def put_ambulance_set_busy(self):
-        self.client.put("/ambulances/set_busy_status/1", headers= {
+        self.client.put("/ambulances/set_busy_status/5", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
 
     @task 
     def put_ambulance_make_available(self):
-        self.client.put("/ambulances/make_available/1", headers= {
+        self.client.put("/ambulances/make_available/5", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
     
     @task 
     def put_ambulance_exclude(self):
-        self.client.put("/ambulances/exclude/1", headers= {
+        self.client.put("/ambulances/exclude/5", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
@@ -142,7 +142,7 @@ class AppUser(HttpUser):
 
     @task
     def get_patient(self):
-        self.client.get("/patients/1/", headers= {
+        self.client.get("/patients/5/", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
@@ -157,7 +157,7 @@ class AppUser(HttpUser):
         "name": name,
         "people": 2,
         "address": "dluga 5, Krakow",
-        "type": type,
+        "type": "s",
         }, headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
@@ -167,7 +167,7 @@ class AppUser(HttpUser):
     def put_patient_update(self):
         name = ''.join(random.choices(string.ascii_lowercase, k=5))
         
-        self.client.put("/patients/update/2", json=
+        self.client.put("/patients/update/5", json=
         {
         "name": name,
         "people": 2,
@@ -180,28 +180,28 @@ class AppUser(HttpUser):
 
     @task 
     def put_patient_suggest(self):
-        self.client.put("/patients/suggest/107", headers= {
+        self.client.put("/patients/suggest/23", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
 
     @task
     def put_patient_accept(self):
-        self.client.put("/patients/accept/107", headers= {
+        self.client.put("/patients/accept/23", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
 
-    @task 
-    def put_patient_reject(self):
-        self.client.put("/patients/reject/1", headers= {
-                        "Content-Type": "application/json",
-                        'Authorization': "Bearer " + token,
-                    })
+    # @task 
+    # def put_patient_reject(self):
+    #     self.client.put("/patients/reject/5", headers= {
+    #                     "Content-Type": "application/json",
+    #                     'Authorization': "Bearer " + token,
+    #                 })
 
     @task 
     def put_patient_start(self):
-        self.client.put("/patients/start/1", headers= {
+        self.client.put("/patients/start/5", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
@@ -209,7 +209,7 @@ class AppUser(HttpUser):
 
     @task 
     def put_patient_close(self):
-        self.client.put("/patients/close/1", headers= {
+        self.client.put("/patients/close/5", headers= {
                         "Content-Type": "application/json",
                         'Authorization': "Bearer " + token,
                     })
