@@ -30,7 +30,9 @@ async def fetch_patient(ambulance: Union[str, None] = None, token: str = Depends
                    })
     
     if(response.json().get('nickname') is not None):
-        return conn.execute(patients.select()).fetchall()
+        if ambulance: return conn.execute(patients.select().where(patients.c.ambulance == ambulance)).fetchall()
+        else:
+            return conn.execute(patients.select()).fetchall()
     else:
         sentry_sdk.capture_exception(Exception("HTTP_401_UNAUTHORIZED, Not authorized"))
         return response.json()
@@ -80,7 +82,10 @@ async def update_patient(id: int, patient: Patient, token: str = Depends(oauth2_
         )
     conn.execute(patients.update().values(
         name = patient.name,
-        address = patient.address
+        address = patient.address,
+        ambulance = patient.ambulance,
+        people = patient.people,
+        type = patient.type
     ).where(patients.c.id == id))
 
     url = 'http://user-service:80/users/me'
@@ -236,6 +241,32 @@ async def accept_patient(id: int, token: str = Depends(oauth2_scheme)):
         sentry_sdk.capture_exception(Exception("HTTP_401_BAD_REQUEST, Not authorized"))
         return response.json()
 
+@patient.put('/set/{id}')
+async def set_patient(id: int, ambulance: str, token: str = Depends(oauth2_scheme)):
+    patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
+    if patient_db is None:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient with this id doesn't exist"
+        )
+
+    conn.execute(patients.update().values(
+        status = "Ambulance Assigned",
+        ambulance = ambulance
+    ).where(patients.c.id == id))
+
+    url = 'http://user:80/users/me'
+
+    response = requests.get(url, headers={
+        "Content-Type": "application/json",
+        'Authorization': "Bearer " + token,
+    })
+
+    if(response.json().get('nickname') is not None):
+        return "Patient updated"
+    else:
+        return response.json()
+
 @patient.put('/reject/{id}')
 async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
     patient_db = conn.execute(patients.select().where(patients.c.id == id)).first()
@@ -309,7 +340,7 @@ async def start_patient(id: int, token: str = Depends(oauth2_scheme)):
         status = "Finished"
     ).where(patients.c.id == id))
 
-    url = 'http://user-service:80/users/me'
+    url = 'http://user:80/users/me'
 
     response = requests.get(url, headers= {
                        "Content-Type": "application/json",

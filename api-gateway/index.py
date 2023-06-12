@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import Response

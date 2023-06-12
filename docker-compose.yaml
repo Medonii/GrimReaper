@@ -1,4 +1,3 @@
-version: "3"
 services:
 
   GrimReaperFront:
@@ -10,6 +9,7 @@ services:
       - "3000:3000"
 
   patient:
+    image: localhost:8008/patient
     build:
       context: patient
       dockerfile: Dockerfile
@@ -22,6 +22,7 @@ services:
 
 
   user:
+    image: localhost:80/user
     build: 
       context: user
       dockerfile: Dockerfile
@@ -34,6 +35,7 @@ services:
 
 
   ambulance:
+    image: localhost:8000/ambulance
     build: 
       context: ambulance
       dockerfile: Dockerfile
@@ -45,6 +47,7 @@ services:
       - .:/GrimReaper/ambulance
   
   api-gateway:
+    image: localhost:8080/api-gateway
     build: 
       context: api-gateway
       dockerfile: Dockerfile
