@@ -1,5 +1,4 @@
 from typing import Union
-from ambulance.models.ambulance import ambulances
 from fastapi import APIRouter, HTTPException, status, Request, Depends, Security
 from fastapi.security import OAuth2PasswordBearer
 from models.patient import patients
@@ -277,8 +276,18 @@ async def reject_patient(id: int, token: str = Depends(oauth2_scheme)):
             detail="patient with this id doesn't exist"
         )
 
-    ambulance_db = conn.execute(ambulances.select().where(ambulances.c.tag == patient_db.ambulance)).first()
-    requests.put('http://ambulance-service:8000/make_available/' + str(ambulance_db['id']), headers= {
+    url = 'http://ambulance-service:8000/'
+    response = requests.get(url, headers= {
+                       "Content-Type": "application/json",
+                       'Authorization': "Bearer " + token,
+                   })
+    data = response.text
+    parsed = json.loads(data)
+
+    for ambulance in parsed:
+        if ambulance['tag'] == patient_db.ambulance:
+            selected = ambulance
+    requests.put('http://ambulance-service:8000/make_available/' + str(selected['id']), headers= {
                        "Content-Type": "application/json",
                        'Authorization': "Bearer " + token,
                    })

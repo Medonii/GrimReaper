@@ -15,16 +15,17 @@ spec:
       containers:
       - name: patientcontainer
         image: medonii/grimreaper:grimreaper-patient
-        command: ["sleep"]
-        args:
-          - "3600000"
         imagePullPolicy: Always
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
         ports:
         - containerPort: 8008
+        env:
+        - name: db_root_password
+          valueFrom:
+            secretKeyRef:
+              name: grimreaper-secrets
+              key: db_root_password
+        - name: db_name
+          value: GrimReaper
       imagePullSecrets:
       - name: medonii
 ---
@@ -38,4 +39,4 @@ spec:
   ports:
   - port: 8008
     targetPort: 8008
-  type: LoadBalancer
+  type: ClusterIP

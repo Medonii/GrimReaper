@@ -9,7 +9,6 @@ services:
       - "3000:3000"
 
   patient:
-    image: localhost:8008/patient
     build:
       context: patient
       dockerfile: Dockerfile
