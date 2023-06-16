@@ -1,5 +1,4 @@
 import React, {useContext, useState} from "react";
-import $ from "jquery";
 import 'bulma/css/bulma.min.css';
 import ErrorMessage from "./ErrorMessage";
 import {UserContext} from "../context/UserContext";
@@ -10,7 +9,6 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [,setToken] = useContext(UserContext);
-    //commenfewifonfsifnsofnfiosfosiefnseofsofnisofns
     const submitLogin = async () => {
 
         const urlencoded = new URLSearchParams();
@@ -25,7 +23,7 @@ const Login = () => {
             redirect: "follow"
         };
 
-        const response = await fetch("http://user-service:80/token", requestOptions)
+        const response = await fetch("http://user-service:8888/token", requestOptions)
         const data = await response.json();
 
         if(!response.ok) {

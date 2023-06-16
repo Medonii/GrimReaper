@@ -37,7 +37,7 @@ app.add_middleware(
 )
 
 
-SERVICE_URL_USER = "http://user-service:80"
+SERVICE_URL_USER = "http://user-service:8888"
 SERVICE_URL_AMBULANCE = "http://ambulance-service:8000"
 SERVICE_URL_PATIENT = "http://patient-service:8008"
 

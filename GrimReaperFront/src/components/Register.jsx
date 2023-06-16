@@ -25,7 +25,7 @@ const Register = () => {
                 redirect: "follow"
             };
 
-            const response = await fetch("http://user-service:80/register", requestOptions)
+            const response = await fetch("http://user-service:8888/register", requestOptions)
                 const data = await response.json();
 
             if(!response.ok) {

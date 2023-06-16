@@ -21,20 +21,18 @@ services:
 
 
   user:
-    image: localhost:80/user
     build: 
       context: user
       dockerfile: Dockerfile
     container_name: usercontainer
-    command: uvicorn user.index:app --host 0.0.0.0 --port 80 --reload --reload-include *
+    command: uvicorn user.index:app --host 0.0.0.0 --port 8888 --reload --reload-include *
     ports:
-      - "80:80"
+      - "8888:8888"
     volumes:
       - .:/GrimReaper/user
 
 
   ambulance:
-    image: localhost:8000/ambulance
     build: 
       context: ambulance
       dockerfile: Dockerfile
@@ -46,7 +44,6 @@ services:
       - .:/GrimReaper/ambulance
   
   api-gateway:
-    image: localhost:8080/api-gateway
     build: 
       context: api-gateway
       dockerfile: Dockerfile

@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: grimreaper-ingress
+spec:
+  rules:
+  - host: grimreaper.com
+    http:
+      paths:
+      - path: /ambulance
+        pathType: ImplementationSpecific
+        backend:
+          service: 
+            name: ambulance-service
+            port: 
+              number: 8000
+      - path: /patient
+        pathType: ImplementationSpecific
+        backend:
+          service: 
+            name: patient-service
+            port: 
+              number: 8008
+      - path: /api-gateway
+        pathType: ImplementationSpecific
+        backend:
+          service: 
+            name: api-gateway-service
+            port: 
+              number: 8080
+      - path: /user
+        pathType: ImplementationSpecific
+        backend:
+          service: 
+            name: user-service
+            port: 
+              number: 8888
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service: 
+            name: front-service
+            port: 
+              number: 3000
